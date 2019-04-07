@@ -1,0 +1,4 @@
+argparse
+pyscreenshot
+boto3
+botocore
