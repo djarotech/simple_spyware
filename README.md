@@ -4,8 +4,10 @@
 2. install pip3 for dependencies
 3. `pip3 install -r requirements.txt`
 4. run with parameters. `python3 main.py -h`
+5. use `python3 main.py --output_dir $PWD` for development, it saves
+screenshots locally.
 
-## S3 support
+## AWS S3 support - this is where the spyware will send the data
 1. To run using s3, please set ACCESS_KEY_ID and ACCESS_SECRET_KEY environmental variables
     to whatever credentials you generated on AWS
 ```
@@ -24,9 +26,10 @@ export ACCESS_SECRET_KEY=FARUEWRJEWHRJEQFIQEWJFWJQE@#$@#! <- replace this
 7. cleanup bucket
 `aws s3 rb s3://cs361p-spyware --force`
 
-## IDEAS to work on
+## Ideas to work on
 1. someone figure out how to run this script upon computer restart and login.
 2. Keylogging feature. I was thinking after 10 seconds of no typing, make
 a new line in the file
 Note: we need to have the datetime at the beginning of each line in
-the keylogger file.
+the keylogging file.
+3. Add any other feature you think of !

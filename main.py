@@ -10,6 +10,7 @@ def main(args):
     duration = args.duration
     interval = args.interval
     output_dir = args.output_dir
+    s3_bucket = args.s3_bucket
 
     if not os.path.isdir(output_dir):
         print('Output directory is not a directory.')
@@ -18,13 +19,17 @@ def main(args):
     cur_date = datetime.now()
     end_date = timedelta(days=duration) + cur_date
     delta = timedelta(seconds=interval)
+    
     while cur_date <= end_date:
         im = screenshot.grab()
-        file_name = 'screenshot'+cur_date.strftime("%m-%d-%M-%S")+'.png'
+        file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.png'
         fp = output_dir + '/' + file_name
         im.save(fp)
-        utils.save_to_s3(fp, file_name)
-        os.remove(fp)
+        # save to the cloud and rm file locally
+        if s3_bucket == "":
+            utils.save_to_s3(fp, file_name)
+            os.remove(fp)
+
         cur_date += delta
 
 
