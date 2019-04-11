@@ -26,7 +26,7 @@ def main(args):
         fp = output_dir + '/' + file_name
         im.save(fp)
         # save to the cloud and rm file locally
-        if s3_bucket == "":
+        if s3_bucket != "":
             utils.save_to_s3(fp, file_name)
             os.remove(fp)
 
