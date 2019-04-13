@@ -2,5 +2,5 @@ argparse
 pyscreenshot
 boto3
 botocore
-sqlite3
-subprocess
+pillow
+psutil

