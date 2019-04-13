@@ -4,7 +4,7 @@ import pyscreenshot as screenshot
 import os
 from datetime import timedelta, date, datetime
 import utils
-
+import time
 
 def main(args):
     duration = args.duration
@@ -30,8 +30,9 @@ def main(args):
             utils.save_to_s3(fp, file_name)
             os.remove(fp)
 
-        cur_date += delta
+        time.sleep(int(interval))
 
+        cur_date += delta
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
