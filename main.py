@@ -7,6 +7,10 @@ import utils
 import time
 
 def main(args):
+	# Describes what is happening
+    print("This spyware is takes a screeshot of the computer it is running on every 10 seconds.")
+    print("There is also a keylogging feature keeping track of each key pressed.")
+    print("It is probably taking screenshots of your screen right now as you are reading this. :)")
     duration = args.duration
     interval = args.interval
     output_dir = args.output_dir
@@ -33,6 +37,11 @@ def main(args):
         time.sleep(int(interval))
 
         cur_date += delta
+
+# Instruction panel
+def inspanel():
+    print("Enter 1 to run the program")
+    print("Enter 2 to exit")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
