@@ -19,7 +19,7 @@ def main(args):
     cur_date = datetime.now()
     end_date = timedelta(days=duration) + cur_date
     delta = timedelta(seconds=interval)
-    
+
     while cur_date <= end_date:
         im = screenshot.grab()
         file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.png'
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                       help = "The interval of the screenshots in seconds")
     parser.add_argument("-o", "--output_dir", default=os.environ['HOME'],
                       help = "The output directory of the screenshots")
-    parser.add_argument("-s3", "--s3_bucket",
+    parser.add_argument("-s3", "--s3_bucket", default="",
                       help = "The output directory of the screenshots")
 
     args = parser.parse_args()
