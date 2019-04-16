@@ -33,3 +33,13 @@ a new line in the file
 Note: we need to have the datetime at the beginning of each line in
 the keylogging file.
 3. Add any other feature you think of !
+
+## Team (github usernames)
+Stephen-AI
+
+bohanz2009
+
+DilanGalindo
+
+nithinp300
+
